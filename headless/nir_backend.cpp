@@ -556,6 +556,22 @@ private:
         b.fp_math_ctrl = nir_fp_fast_math;
     }
 
+    // FPMin/FPMax as spirv_to_nir makes them of the SPIR-V backend's FMin/FMax, or of NMin/NMax
+    // (need_nan_safe_min_max: NaN preserved, so the operand that is not NaN is returned).
+    unsigned MinMaxControl() const {
+        return nir_fp_preserve_inf | (profile.need_nan_safe_min_max ? nir_fp_preserve_nan : 0U);
+    }
+    // FPClamp/FPSaturate: FClamp, or NMin(NMax(value, low), high) with need_nan_safe_min_max
+    // (NaN becomes the lower bound, 0 for saturation, as on Maxwell).
+    nir_def* Clamp(nir_def* value, nir_def* low, nir_def* high) {
+        if (profile.need_nan_safe_min_max) {
+            Fp(32, MinMaxControl());
+            return nir_fmin(&b, nir_fmax(&b, value, low), high);
+        }
+        b.fp_math_ctrl = nir_fp_preserve_inf;
+        return nir_fclamp(&b, value, low, high);
+    }
+
     nir_def* LaneId() {
         return nir_load_subgroup_invocation(&b);
     }
@@ -1067,20 +1083,18 @@ private:
             Set(inst, nir_ffma(&b, arg(0), arg(1), arg(2)));
             return;
         case Opcode::FPMax32:
-            Fp(32, nir_fp_preserve_inf);
+            Fp(32, MinMaxControl());
             Set(inst, nir_fmax(&b, arg(0), arg(1)));
             return;
         case Opcode::FPMin32:
-            Fp(32, nir_fp_preserve_inf);
+            Fp(32, MinMaxControl());
             Set(inst, nir_fmin(&b, arg(0), arg(1)));
             return;
         case Opcode::FPClamp32:
-            b.fp_math_ctrl = nir_fp_preserve_inf;
-            Set(inst, nir_fclamp(&b, arg(0), arg(1), arg(2)));
+            Set(inst, Clamp(arg(0), arg(1), arg(2)));
             return;
         case Opcode::FPSaturate32:
-            b.fp_math_ctrl = nir_fp_preserve_inf;
-            Set(inst, nir_fclamp(&b, arg(0), nir_imm_float(&b, 0.0f), nir_imm_float(&b, 1.0f)));
+            Set(inst, Clamp(arg(0), nir_imm_float(&b, 0.0f), nir_imm_float(&b, 1.0f)));
             return;
         case Opcode::FPRoundEven32:
             Fp(32);
