@@ -94,7 +94,8 @@ Only these subfolders matter; the folder itself can have any name and location.
 │   └── *.nca                           # extracted firmware NCAs
 ├── roms/
 │   ├── Game.nsp
-│   └── Game.xci
+│   ├── Game.xci
+│   └── Game.nup                        # Switch 2 NUP (NX Package): base and updates in one file
 ├── updates/                            # optional: update and DLC files
 │   └── Game update.nsp
 ├── mods/                               # optional: mods, one folder per title ID
