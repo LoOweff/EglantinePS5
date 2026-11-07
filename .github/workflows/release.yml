@@ -83,6 +83,7 @@ jobs:
           {
             echo "CACHE_ROOT=$cache_root"
             echo "RADV_NATIVE=$(dirname "$GITHUB_WORKSPACE")/mihawk-vulkan-review/.deps/native"
+            echo "RADV_WORK=$(dirname "$GITHUB_WORKSPACE")/mihawk-vulkan-review/.deps/work"
             echo "EGLANTINEPS5_DEPS_CACHE=$cache_root/downloads"
             echo "CCACHE_DIR=$cache_root/ccache"
             echo "XDG_CACHE_HOME=$cache_root/xdg"
@@ -140,8 +141,8 @@ jobs:
             ${{ env.RADV_NATIVE }}/radv-release
             ${{ env.RADV_NATIVE }}/ps5-payload-sdk
             ${{ env.RADV_NATIVE }}/zlib
-            ${{ env.RADV_NATIVE }}/../work/radv-src
-            ${{ env.RADV_NATIVE }}/../work/radv-build-ps5-release
+            ${{ env.RADV_WORK }}/radv-src
+            ${{ env.RADV_WORK }}/radv-build-ps5-release
             build/radv-isolated
           key: radv-4-${{ hashFiles('tools/deps.json', 'tools/patch-radv-wsi.py', 'tools/build-radv-dependencies.sh', 'tools/isolate-radv.py', 'tools/ci/ubuntu-24.04-packages.txt', 'tools/ci/setup-ubuntu-24.04.sh') }}
 
@@ -212,8 +213,8 @@ jobs:
             ${{ env.RADV_NATIVE }}/radv-release
             ${{ env.RADV_NATIVE }}/ps5-payload-sdk
             ${{ env.RADV_NATIVE }}/zlib
-            ${{ env.RADV_NATIVE }}/../work/radv-src
-            ${{ env.RADV_NATIVE }}/../work/radv-build-ps5-release
+            ${{ env.RADV_WORK }}/radv-src
+            ${{ env.RADV_WORK }}/radv-build-ps5-release
             build/radv-isolated
           key: radv-4-${{ hashFiles('tools/deps.json', 'tools/patch-radv-wsi.py', 'tools/build-radv-dependencies.sh', 'tools/isolate-radv.py', 'tools/ci/ubuntu-24.04-packages.txt', 'tools/ci/setup-ubuntu-24.04.sh') }}
 
